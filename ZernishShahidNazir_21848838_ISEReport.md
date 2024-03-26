@@ -66,7 +66,7 @@ I created two modules, one for each scenario and further divided each module int
 -	Depending on the scenario chosen, the program will provide information about the season for a given country and month, or whether a temperature reading is above or below average for a city.
 
 #### Sample output of running production code
-![sample output](example1.png)
+![sample output](sampleCode.png)
 
 
 #### brief explanation on application of modularity concepts 
@@ -92,6 +92,77 @@ To address the issue of redundancy, I refactored the ‘TemperatureModule’ cla
 
 This method separated the logic for retrieving the daily mean temperature based on the city name, to a separate method. Both ‘validateTemperature’ and ‘compareTemperature’ now call this other method to get the daily mean temperature, reducing redundancy and making the code easier to maintain. By refactoring the code in this way, I ensured that if the logic for determining the daily mean temperature needs to be changed in the future, it only needs to be updated in one place (getDailyMeanTemperature method) rather than in multiple places, reducing confusion and errors. 
 Finally, I revised module descriptions to add the new method.
+
+# Test design- Black-box test cases
+
+####** Equivalence Partitioning** 
+
+### Submodule: validateInput
+
+| Category                           | Test Data                   | Expected result |
+|------------------------------------|-----------------------------|-----------------|
+| Valid country and valid month combination   | country = "Australia", month = "January"  | true            |
+| Valid country and invalid month combination | country = "Australia", month = "InvalidMonth" | false           |
+| Invalid country and valid month combination | country = "InvalidCountry", month = "January" | false           |
+| Invalid country and invalid month combination | country = "InvalidCountry", month = "InvalidMonth" | false        |
+
+### Submodule: findSeason
+
+| Category                           | Test Data                   | Expected result |
+|------------------------------------|-----------------------------|-----------------|
+| Valid country and valid month combination   | Country = "Australia", Month = "January"  | Season = "Summer" |
+| Valid country and invalid month combination | Country = "Noongar", Month = "July" | Season = "Invalid input message" |
+| Invalid country                     | Country = "Nazir"           | Prompt for country again |
+
+### Submodule: validateTemperature
+
+| Category                           | Test Data                   | Expected result |
+|------------------------------------|-----------------------------|-----------------|
+| Valid City && valid temperature   | City = "Perth", Temperature = 20.0  | No output |
+| Invalid Temperature | City = "Perth", Temperature = 838 | "Invalid temperature reading. Valid range is 0.7°C to 46.0°C." |
+| Invalid City | City = "Paris" | “Invalid city” |
+
+### Submodule: compareTemperature
+
+| Category                           | Test Data                   | Expected result |
+|------------------------------------|-----------------------------|-----------------|
+| Temperature above average by less than 6 degrees | City = "Perth", Temperature = 25.0 | "Temperature reading is above the average" |
+| Temperature below average by less than 6 degrees | City = "Perth", Temperature = 15.0 | "Temperature reading is below the average" |
+| Temperature above average by more than 6 degrees | City = "Perth", Temperature = 30.0 | "Temperature reading is above the average by more than 6 degrees" |
+| Temperature below average by more than 6 degrees | City = "Perth", Temperature = 5.0 | "Temperature reading is below the average by more than 6 degrees" |
+| Invalid City | City = "Paris", Temperature = 20.0 | "Invalid city" |
+
+### Submodule: getDailyMeanTemperature
+
+| Category                           | Test Data                   | Expected result |
+|------------------------------------|-----------------------------|-----------------|
+| Valid city | City = "Perth" | dailyMeanTemperature = 18.2 |
+| Valid city | City = "Dubai" | dailyMeanTemperature = 26.9 |
+| Invalid city | City = "Paris" | Throws IllegalArgumentException (Invalid city) |
+
+## BVA for compareTemperature
+
+### Boundary category
+
+| Test Data                   | Expected Result |
+|-----------------------------|-----------------|
+| Temperature= 0.6, Temperature= 0.7 | "Invalid temperature reading. Valid range is 0.7°C to 46.0°C.", "Temperature reading is below the average by more than 6 degrees" |
+| Temperature= 12.2, Temperature= 12.3 | "Temperature reading is below the average by more than 6 degrees", "Temperature reading is above/below the average" |
+| Temperature= 24.1, Temperature= 24.2 | "Temperature reading is above/below the average", "Temperature reading is above the average by more than 6 degrees" |
+| Temperature= 46.0, Temperature= 46.1 | "Temperature reading is above the average by more than 6 degrees", "Invalid temperature reading. Valid range is 0.7°C to 46.0°C." |
+
+## Test design decisions
+
+- **validateInput:** Equivalence partitioning was used to cover different combinations of valid and invalid inputs for country and month. Since this submodule deals with input validation, testing all possible combinations is necessary.
+- **findSeason:** Equivalence partitioning was again used to test various combinations of valid and invalid country and month inputs, ensuring that the submodule returns the correct season based on the input. Invalid country inputs trigger a prompt for the country again, which is tested again.
+- **validateTemperature:** Equivalence partitioning was applied to cover valid and invalid inputs for city and temperature. Each category was tested to ensure the correct response: no output for valid city and temperature, appropriate error messages for invalid temperature and city inputs.
+- **compareTemperature:** BVA was specifically applied to this submodule because it deals with numerical temperature values and involves comparing these values with the average temperature of a city. By focusing on the boundaries, BVA helps identify potential issues related to temperature comparisons, such as incorrect handling of extreme values. The chosen boundaries cover scenarios where the temperature is at or near the extremes of the valid range, therefore thoroughly testing the temperature.
+- **getDailyMeanTemperature:** Equivalence partitioning was used to test the submodule's behavior for valid and invalid city inputs. Since this submodule retrieves the daily mean temperature based on the city, testing different valid and invalid city inputs ensures correct functionality.
+
+# White-box test cases 
+
+
+
 
 
 
