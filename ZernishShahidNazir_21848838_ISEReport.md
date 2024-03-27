@@ -97,7 +97,7 @@ Finally, I revised module descriptions to add the new method.
 
 ####** Equivalence Partitioning** 
 
-### Submodule: validateInput
+#### Submodule: validateInput
 
 | Category                           | Test Data                   | Expected result |
 |------------------------------------|-----------------------------|-----------------|
@@ -106,7 +106,7 @@ Finally, I revised module descriptions to add the new method.
 | Invalid country and valid month combination | country = "InvalidCountry", month = "January" | false           |
 | Invalid country and invalid month combination | country = "InvalidCountry", month = "InvalidMonth" | false        |
 
-### Submodule: findSeason
+#### Submodule: findSeason
 
 | Category                           | Test Data                   | Expected result |
 |------------------------------------|-----------------------------|-----------------|
@@ -114,7 +114,7 @@ Finally, I revised module descriptions to add the new method.
 | Valid country and invalid month combination | Country = "Noongar", Month = "July" | Season = "Invalid input message" |
 | Invalid country                     | Country = "Nazir"           | Prompt for country again |
 
-### Submodule: validateTemperature
+#### Submodule: validateTemperature
 
 | Category                           | Test Data                   | Expected result |
 |------------------------------------|-----------------------------|-----------------|
@@ -122,7 +122,7 @@ Finally, I revised module descriptions to add the new method.
 | Invalid Temperature | City = "Perth", Temperature = 838 | "Invalid temperature reading. Valid range is 0.7°C to 46.0°C." |
 | Invalid City | City = "Paris" | “Invalid city” |
 
-### Submodule: compareTemperature
+#### Submodule: compareTemperature
 
 | Category                           | Test Data                   | Expected result |
 |------------------------------------|-----------------------------|-----------------|
@@ -132,7 +132,7 @@ Finally, I revised module descriptions to add the new method.
 | Temperature below average by more than 6 degrees | City = "Perth", Temperature = 5.0 | "Temperature reading is below the average by more than 6 degrees" |
 | Invalid City | City = "Paris", Temperature = 20.0 | "Invalid city" |
 
-### Submodule: getDailyMeanTemperature
+#### Submodule: getDailyMeanTemperature
 
 | Category                           | Test Data                   | Expected result |
 |------------------------------------|-----------------------------|-----------------|
@@ -140,18 +140,16 @@ Finally, I revised module descriptions to add the new method.
 | Valid city | City = "Dubai" | dailyMeanTemperature = 26.9 |
 | Invalid city | City = "Paris" | Throws IllegalArgumentException (Invalid city) |
 
-## BVA for compareTemperature
+#### BVA for compareTemperature
 
-### Boundary category
+| Boundary category | Test Data | Expected Result |
+|-------------------|-----------|-----------------|
+| Between invalid (below min temp) and ≥6 degrees less than mean | Temperature= 0.6, Temperature= 0.7 | "Invalid temperature reading. Valid range is 0.7°C to 46.0°C.", "Temperature reading is below the average by more than 6 degrees" |
+| Between ≥6 degrees less than mean and valid temp range | Temperature= 12.2, Temperature= 12.3 | "Temperature reading is below the average by more than 6 degrees", "Temperature reading is above/below the average" |
+| Between valid temp range and ≥6 degrees more than mean | Temperature= 24.1, Temperature= 24.2 | "Temperature reading is above/below the average", "Temperature reading is above the average by more than 6 degrees" |
+| Between ≥6 degrees more than mean and invalid (above max temp) | Temperature= 46.0, Temperature= 46.1 | "Temperature reading is above the average by more than 6 degrees", "Invalid temperature reading. Valid range is 0.7°C to 46.0°C." |
 
-| Test Data                   | Expected Result |
-|-----------------------------|-----------------|
-| Temperature= 0.6, Temperature= 0.7 | "Invalid temperature reading. Valid range is 0.7°C to 46.0°C.", "Temperature reading is below the average by more than 6 degrees" |
-| Temperature= 12.2, Temperature= 12.3 | "Temperature reading is below the average by more than 6 degrees", "Temperature reading is above/below the average" |
-| Temperature= 24.1, Temperature= 24.2 | "Temperature reading is above/below the average", "Temperature reading is above the average by more than 6 degrees" |
-| Temperature= 46.0, Temperature= 46.1 | "Temperature reading is above the average by more than 6 degrees", "Invalid temperature reading. Valid range is 0.7°C to 46.0°C." |
-
-## Test design decisions
+#### Test design decisions
 
 - **validateInput:** Equivalence partitioning was used to cover different combinations of valid and invalid inputs for country and month. Since this submodule deals with input validation, testing all possible combinations is necessary.
 - **findSeason:** Equivalence partitioning was again used to test various combinations of valid and invalid country and month inputs, ensuring that the submodule returns the correct season based on the input. Invalid country inputs trigger a prompt for the country again, which is tested again.
@@ -159,7 +157,50 @@ Finally, I revised module descriptions to add the new method.
 - **compareTemperature:** BVA was specifically applied to this submodule because it deals with numerical temperature values and involves comparing these values with the average temperature of a city. By focusing on the boundaries, BVA helps identify potential issues related to temperature comparisons, such as incorrect handling of extreme values. The chosen boundaries cover scenarios where the temperature is at or near the extremes of the valid range, therefore thoroughly testing the temperature.
 - **getDailyMeanTemperature:** Equivalence partitioning was used to test the submodule's behavior for valid and invalid city inputs. Since this submodule retrieves the daily mean temperature based on the city, testing different valid and invalid city inputs ensures correct functionality.
 
+
 # White-box test cases 
+
+#### validateTemperature (if block)
+
+| Path                       | Test Data                                   | Expected Result                                       |
+|----------------------------|---------------------------------------------|--------------------------------------------------------|
+| Enter the 'Perth' if part | City = "Perth", Temperature = 20.0         | No output (successful validation)                     |
+| Enter the 'Dubai' if part | City = "Dubai", Temperature = 30.0         | No output (successful validation)                     |
+| Enter the else part       | City = "Paris", Temperature = 20.0         | Output: "Invalid city" (indicating invalid city entry)|
+
+#### validateTemperature (try-catch block)
+
+| Path          | Test Data                               | Expected Result                                       |
+|---------------|-----------------------------------------|--------------------------------------------------------|
+| Success       | Valid city name, valid dailyMeanTemperature | No exception thrown, no output                    |
+| Invalid City  | Invalid city name (e.g., "Paris")      | Caught IllegalArgumentException, prints "Invalid city" message and returns |
+
+#### compareTemperature
+
+| Path                 | Test Data        | Expected Result                                            |
+|----------------------|------------------|-------------------------------------------------------------|
+| Enter outer if part | temperatureDifference = 7.0 | "Temperature reading is above the average by more than 6 degrees" |
+| Enter inner if part | temperatureDifference = 2.0 | "Temperature reading is above the average"                      |
+| Enter inner else if part (else-if 1) | temperatureDifference = -3.0 | "Temperature reading is below the average"                      |
+| Enter outer else part | temperatureDifference = 0.0 | "Temperature reading is at the average"                          |
+
+#### Test design decisions 
+
+- These specific white-box test cases were chosen because they target critical paths within the methods that are essential for ensuring the correctness and robustness of the code.
+- For the `validateTemperature` method, the test cases were structured to cover both the successful validation path and the exception handling path. On the other hand, for the exception handling path, a test case was created to simulate an invalid city name, triggering the catch block. This test aimed to validate the method's ability to catch and appropriately handle an `IllegalArgumentException` when an invalid city name is provided, confirming that the method responds as intended.
+- As for the `compareTemperature` method, the white-box test cases were designed to thoroughly examine the nested if-else statement within the method. Each test case corresponds to a different branch of the nested structure, ensuring coverage of all possible code paths. By evaluating these separate parts, the test case verifies that the method produces the correct message based on the temperature difference. This approach ensures comprehensive testing of the method's logic and behavior under different conditions. 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
